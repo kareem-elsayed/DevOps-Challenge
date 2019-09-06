@@ -18,7 +18,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.backend=web"
-      - "traefik.frontend.rule=PathPrefixStrip:/test1"
+      - "traefik.frontend.rule=PathPrefixStrip:/test"
       - "traefik.port=8000"
     networks:
       - traefik
