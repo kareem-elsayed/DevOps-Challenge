@@ -93,11 +93,12 @@ jobs:
 
             docker tag web-app keko00/web-app:latest-dev
             docker push keko00/web-app:latest-dev
-#      - run:
-#          name: Deployment
-#          command: |
-#            ssh-keyscan ${JUMP_HOST} >> ~/.ssh/known_hosts
-#            ssh ${DEV_USER}@${JUMP_HOST} "helm upgrade --force --namespace dev --install   geo-ip-api devops/environments/dev/api/geo-ip-api --set=image.tag=dev-${CIRCLE_SHA1:0:10}"
+      - run:
+          name: Deployment
+          command: |
+            ssh-keyscan ${JUMP_HOST} >> ~/.ssh/known_hosts
+            ssh ${DEPLOY_USER}@${JUMP_HOST} "sudo docker-compose up -d"
+            
 workflows:
   version: 2
   build_and_test:
