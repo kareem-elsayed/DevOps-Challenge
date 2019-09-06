@@ -23,7 +23,7 @@ services:
     networks:
       - traefik
     depends_on:
-      - redis-dev
+      - redis
 
 networks:
   traefik:

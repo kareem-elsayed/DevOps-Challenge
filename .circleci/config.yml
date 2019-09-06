@@ -136,7 +136,7 @@ jobs:
       - run:
           name: Build Image
           command: |
-            docker build -t web-app .
+            docker build -t web-app -f Dockerfile_prod .
 
       - run:
           name: Push Image
