@@ -1,7 +1,7 @@
 version: '3'
 services:
   redis:
-    container_name: redis
+    container_name: redis-dev
     image: "redis:alpine"
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
@@ -11,13 +11,13 @@ services:
     networks:
       - traefik
   web:
-    build: .
-    container_name: web
+    container_name: web-dev
+    image: "keko00/web-app:latest-dev"
     ports:
       - "8000:8000"
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=web"
+      - "traefik.backend=web-dev"
       - "traefik.frontend.rule=PathPrefixStrip:/test1"
       - "traefik.port=8000"
     networks:

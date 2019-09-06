@@ -51,6 +51,7 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}
@@ -92,11 +93,66 @@ jobs:
 
             docker tag web-app keko00/web-app:latest-dev
             docker push keko00/web-app:latest-dev
-#      - run:
-#          name: Deployment
-#          command: |
-#            ssh-keyscan ${JUMP_HOST} >> ~/.ssh/known_hosts
-#            ssh ${DEV_USER}@${JUMP_HOST} "helm upgrade --force --namespace dev --install   geo-ip-api devops/environments/dev/api/geo-ip-api --set=image.tag=dev-${CIRCLE_SHA1:0:10}"
+      - run:
+          name: Deployment
+          command: |
+            ssh-keyscan ${JUMP_HOST} >> ~/.ssh/known_hosts
+            ssh -v ${DEPLOY_USER}@${JUMP_HOST} "sudo docker-compose -f DevOps-Challenge/docker-compose_dev.yml up -d"
+  prod:
+    docker:
+      - image: circleci/python:3.6.1
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            python tests/test.py
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
+
+      - run:
+          name: Build Image
+          command: |
+            docker build -t web-app -f Dockerfile_prod .
+
+      - run:
+          name: Push Image
+          command: |
+            docker login --username=${DOCKER_USER} --password=${DOCKER_PASSWORD}
+            docker tag web-app keko00/web-app:prod-${CIRCLE_SHA1:0:10}
+            docker push keko00/web-app:prod-${CIRCLE_SHA1:0:10}
+
+            docker tag web-app keko00/web-app:latest-prod
+            docker push keko00/web-app:latest-prod
+      - run:
+          name: Deployment
+          command: |
+            ssh-keyscan ${JUMP_HOST} >> ~/.ssh/known_hosts
+            ssh -v ${DEPLOY_USER}@${JUMP_HOST} "sudo docker-compose -f DevOps-Challenge/docker-compose_prod.yml up -d"
+
 workflows:
   version: 2
   build_and_test:
