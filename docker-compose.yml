@@ -1,12 +1,31 @@
 version: '3'
 services:
   redis:
+    container_name: redis
     image: "redis:alpine"
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    restart: always
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - traefik
   web:
     build: .
+    container_name: web
     ports:
       - "8000:8000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=web"
+      - "traefik.frontend.rule=PathPrefixStrip:/test1"
+      - "traefik.port=8000"
+    networks:
+      - traefik
     depends_on:
       - redis
-    links:
-      - redis
+
+networks:
+  traefik:
+    external:
+      name: machine_webgateway
