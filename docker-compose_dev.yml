@@ -11,8 +11,8 @@ services:
     networks:
       - traefik
   web:
-    build: .
     container_name: web
+    image: "keko00/web-app:latest-dev"
     ports:
       - "8000:8000"
     labels:
