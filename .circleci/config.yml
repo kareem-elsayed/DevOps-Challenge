@@ -97,7 +97,7 @@ jobs:
           name: Deployment
           command: |
             ssh-keyscan ${JUMP_HOST} >> ~/.ssh/known_hosts
-            ssh -v ${DEPLOY_USER}@${JUMP_HOST} "sudo docker-compose up -d"
+            ssh -v ${DEPLOY_USER}@${JUMP_HOST} "sudo docker-compose -f DevOps-Challenge/docker-compose.yml up -d"
 
 workflows:
   version: 2
