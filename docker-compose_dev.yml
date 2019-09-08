@@ -8,24 +8,14 @@ services:
     restart: always
     labels:
       - "traefik.enable=false"
-    networks:
-      - traefik
+
   web:
-    container_name: web-dev
-    image: "keko00/web-app:latest-dev"
-    ports:
-      - "8000:8000"
+    container_name: web
+    build: .
+    #image: "keko00/web-app:latest-dev"
     labels:
       - "traefik.enable=true"
-      - "traefik.backend=web-dev"
-      - "traefik.frontend.rule=PathPrefixStrip:/test1"
-      - "traefik.port=8000"
-    networks:
-      - traefik
+      - "traefik.frontend.rule=PathPrefixStrip:/trade-web"
+
     depends_on:
       - redis
-
-networks:
-  traefik:
-    external:
-      name: machine_webgateway
